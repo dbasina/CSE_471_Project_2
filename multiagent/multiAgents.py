@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -14,7 +14,7 @@
 
 from util import manhattanDistance
 from game import Directions
-import random, util
+import random, util,math
 
 from game import Agent
 
@@ -71,10 +71,34 @@ class ReflexAgent(Agent):
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        ghostPosition = successorGameState.getGhostPosition(1)
+        capsulePositionList = successorGameState.getCapsules();
+        ghostDistance = math.sqrt(math.pow(newPos[1]-ghostPosition[1],2) + math.pow(newPos[0]-ghostPosition[0],2));
+        if (len(capsulePositionList)!=0):
+            capsulePositions = capsulePositionList[0]
+
+            print "CapsulePositions:", capsulePositions
+            capsuleDistance = math.sqrt(math.pow(newPos[1]-capsulePositions[1],2) + math.pow(newPos[0]-capsulePositions[0],2));
+            newScore = 0.40*successorGameState.getScore() + 0.30*ghostDistance - 0.30*capsuleDistance ;
+            print "Pacman :",newPos," Ghost: ",ghostPosition, "Distance: ",ghostDistance, "GameStatescore: ",successorGameState.getScore(), "New Score: ",newScore
+            #print newScaredTimes
+            return newScore
+        else:
+            newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+            print "Scared Times: ",newScaredTimes
+            if (newScaredTimes[0] > 0):
+                newScore = 0.60*successorGameState.getScore() - 0.40*ghostDistance;
+            else:
+                newScore = 0.80*successorGameState.getScore() + 0.20*ghostDistance;    
+
+
+
+            return newScore
+
+
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        return newScore
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -129,6 +153,35 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
+        # get the number of agents
+        numberOfGameAgents = gameState.getNumAgents();
+
+        legalActions= [];
+        # get the legal actions for all agents.
+        for i in range(numberOfGameAgents):
+            legalActions.append(gameState.getLegalActions(i));
+
+        #Compute pacman utilities
+
+
+        """
+        # Useful information you can extract from a GameState (pacman.py)
+        successorGameState = currentGameState.generatePacmanSuccessor(action)
+        newPos = successorGameState.getPacmanPosition()
+        newFood = successorGameState.getFood()
+        newGhostStates = successorGameState.getGhostStates()
+        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+
+        # Collect legal moves and successor states
+        legalMoves = gameState.getLegalActions()
+
+        # Choose one of the best actions
+        scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
+        bestScore = max(scores)
+        bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
+        chosenIndex = random.choice(bestIndices) # Pick randomly among the best
+        """
+        return
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
@@ -170,4 +223,3 @@ def betterEvaluationFunction(currentGameState):
 
 # Abbreviation
 better = betterEvaluationFunction
-
