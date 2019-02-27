@@ -74,6 +74,8 @@ class ReflexAgent(Agent):
         ghostPosition = successorGameState.getGhostPosition(1)
         capsulePositionList = successorGameState.getCapsules();
         ghostDistance = math.sqrt(math.pow(newPos[1]-ghostPosition[1],2) + math.pow(newPos[0]-ghostPosition[0],2));
+
+        # Go eat the capsule first
         if (len(capsulePositionList)!=0):
             capsulePositions = capsulePositionList[0]
 
@@ -84,20 +86,21 @@ class ReflexAgent(Agent):
             #print newScaredTimes
             return newScore
         else:
+
+            # Chase ghost if ghost is scared
             newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
             print "Scared Times: ",newScaredTimes
             if (newScaredTimes[0] > 0):
                 newScore = 0.60*successorGameState.getScore() - 0.40*ghostDistance;
-            else:
-                newScore = 0.80*successorGameState.getScore() + 0.20*ghostDistance;    
 
+            # Eat remaining food if not scared.
+            else:
+                newScore = 0.30*successorGameState.getScore() + 0.20*ghostDistance-0.45*successorGameState.getNumFood();
 
 
             return newScore
 
 
-
-        "*** YOUR CODE HERE ***"
         return newScore
 
 def scoreEvaluationFunction(currentGameState):
@@ -153,34 +156,27 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        # get the number of agents
-        numberOfGameAgents = gameState.getNumAgents();
+        numberOfAgents = gameState.getNumAgents();
+        depth = 0
+        stateDepthMinMax=[]
+        maxDepthReached = False
+        start=[gameState]
 
-        legalActions= [];
-        # get the legal actions for all agents.
-        for i in range(numberOfGameAgents):
-            legalActions.append(gameState.getLegalActions(i));
+        def recursiveMinMax(depth,start,maxDepthReached,agentNumber):
+            if (maxDepthReached == False):
 
-        #Compute pacman utilities
+                #Expand nodes the start list
+                numberOfStates=len(start)
+                for i in range(numberOfStates):
+                    currentState = start[i];
+                    legalActions = currentState.getLegalActions(agentNumber)
+                    successors=[]
+                    for j in legalActions:
+                        successors.append(currentState.generateSuccessor(agentNumber,j));
 
 
-        """
-        # Useful information you can extract from a GameState (pacman.py)
-        successorGameState = currentGameState.generatePacmanSuccessor(action)
-        newPos = successorGameState.getPacmanPosition()
-        newFood = successorGameState.getFood()
-        newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
-        # Collect legal moves and successor states
-        legalMoves = gameState.getLegalActions()
 
-        # Choose one of the best actions
-        scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
-        bestScore = max(scores)
-        bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
-        chosenIndex = random.choice(bestIndices) # Pick randomly among the best
-        """
         return
         util.raiseNotDefined()
 
