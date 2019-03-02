@@ -327,7 +327,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
-      Your minimax agent with alpha-beta pruning (question 3)
+    Your minimax agent with alpha-beta pruning (question 3)
     """
     def getAction(self, gameState):
         """
