@@ -156,6 +156,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
+        """
         numberOfAgents = gameState.getNumAgents();
         depth = 0
         stateDepthMinMax=[]
@@ -173,11 +174,35 @@ class MinimaxAgent(MultiAgentSearchAgent):
                     successors=[]
                     for j in legalActions:
                         successors.append(currentState.generateSuccessor(agentNumber,j));
+        """
+        pacman = 0
+        ghosts = 1
+        state = gameState
 
+        def max_value(state):
+            if state:  # if terminal
+                print "return utility(state)"
+            best_value = float("-inf")
+            actions = state.getLegalActions(pacman)
+            for a in actions:
+                value = minValue(state.generateSuccessor(pacman, a))
+                best_value = max(best_value, value)
+            return best_value
 
+        def min_value(state):
+            if state: # if terminal
+                print "return utility(state)"
+            ghost = ghost + 1
+            best_value = float("inf")
+            actions = state.getLegalActions(pacman)
+            for a in actions:
+                if ghost != 5: #bc there's 4 ghosts, so iterate 4 times?
+                    value = minValue(state.generateSuccessor(ghost, a))
+                    best_value = min(best_value, value)
+                else: #if on the last ghost
+                    print "do something"
+            return best_value
 
-
-        return
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
@@ -190,6 +215,40 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
+        pacman = 0
+        ghosts = 1
+        state = gameState
+
+        def max_value(state, alpha, beta):
+            if state:  # if terminal
+                print "return utility(state)"
+            best_value = float("-inf")
+            actions = state.getLegalActions(pacman)
+            for a in actions:
+                value = minValue(state.generateSuccessor(pacman, a))
+                best_value = max(best_value, value)
+                if best_value >= beta:
+                    return best_value
+                alpha = max(alpha, best_value)
+            return best_value
+
+        def min_value(state, alpha, beta):
+            if state:  # if terminal
+                print "return utility(state)"
+            ghost = ghost + 1
+            best_value = float("inf")
+            actions = state.getLegalActions(pacman)
+            for a in actions:
+                if ghost != 5:  # bc there's 4 ghosts, so iterate 4 times?
+                    value = minValue(state.generateSuccessor(ghost, a))
+                    best_value = min(best_value, value)
+                else:  # if on the last ghost
+                    print "do something"
+            if best_value <= alpha:
+                return best_value
+            beta = min(beta, best_value)
+            return best_value
+
         util.raiseNotDefined()
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
