@@ -175,33 +175,40 @@ class MinimaxAgent(MultiAgentSearchAgent):
                     for j in legalActions:
                         successors.append(currentState.generateSuccessor(agentNumber,j));
         """
+
         pacman = 0
-        ghosts = 1
-        state = gameState
+        ghost = 1
 
-        def max_value(state):
-            if state:  # if terminal
+        def max_value(state,depth,agent):
+            if state:  #if state is terminal
                 print "return utility(state)"
+            print "define best_action default somehow"
             best_value = float("-inf")
-            actions = state.getLegalActions(pacman)
+            actions = state.getLegalActions(agent)
             for a in actions:
-                value = minValue(state.generateSuccessor(pacman, a))
+                value = min_value(state.generateSuccessor(agent, a),depth,ghost)
                 best_value = max(best_value, value)
-            return best_value
+                best_action = a
+            return best_action
 
-        def min_value(state):
-            if state: # if terminal
+        def min_value(state,depth,agent):
+            if state: #if state is terminal
                 print "return utility(state)"
-            ghost = ghost + 1
-            best_value = float("inf")
-            actions = state.getLegalActions(pacman)
-            for a in actions:
-                if ghost != 5: #bc there's 4 ghosts, so iterate 4 times?
-                    value = minValue(state.generateSuccessor(ghost, a))
+            print "define best_action default somehow"
+            ghost_agent = agent
+            agent = agent + 1
+            if agent == state.getNumAgents() - 1: #num of ghosts (-1 for pacman)
+                print "return state value"
+            else:
+                best_value = float("inf")
+                actions = state.getLegalActions(ghost)
+                for a in actions:
+                    value = min_value(state.generateSuccessor(ghost, a),depth,ghost_agent)
                     best_value = min(best_value, value)
-                else: #if on the last ghost
-                    print "do something"
-            return best_value
+                    best_action = a
+                return best_action
+
+        max_value(gameState, game_depth, pacman)
 
         util.raiseNotDefined()
 
@@ -210,27 +217,32 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       Your minimax agent with alpha-beta pruning (question 3)
     """
 
+    pacman = 0
+    ghosts = 1
+    state = gameState
     def getAction(self, gameState):
         """
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
         pacman = 0
-        ghosts = 1
-        state = gameState
 
-        def max_value(state, alpha, beta):
-            if state:  # if terminal
+        #unfinished
+        """
+        def max_value(state,depth, alpha, beta,agent):
+            if state:  #if state is terminal
                 print "return utility(state)"
             best_value = float("-inf")
-            actions = state.getLegalActions(pacman)
+            actions = state.getLegalActions(agent)
+            print "define best_action default somehow"
             for a in actions:
-                value = minValue(state.generateSuccessor(pacman, a))
+                value = min_value(state.generateSuccessor(agent, a))
                 best_value = max(best_value, value)
+                best_action = a
                 if best_value >= beta:
-                    return best_value
+                    return best_action
                 alpha = max(alpha, best_value)
-            return best_value
+            return best_action
 
         def min_value(state, alpha, beta):
             if state:  # if terminal
@@ -249,6 +261,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             beta = min(beta, best_value)
             return best_value
 
+        max_value(gameState,depth,alpha,beta,agent)
+        """
         util.raiseNotDefined()
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
