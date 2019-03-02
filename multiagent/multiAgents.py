@@ -67,56 +67,56 @@ class ReflexAgent(Agent):
         to create a masterful evaluation function.
         """
         # Useful information you can extract from a GameState (pacman.py)
-    """
-    Design a better evaluation function here.
+        """
+        Design a better evaluation function here.
 
-    The evaluation function takes in the current and proposed successor
-    GameStates (pacman.py) and returns a number, where higher numbers are better.
+        The evaluation function takes in the current and proposed successor
+        GameStates (pacman.py) and returns a number, where higher numbers are better.
 
-    The code below extracts some useful information from the state, like the
-    remaining food (newFood) and Pacman position after moving (newPos).
-    newScaredTimes holds the number of moves that each ghost will remain
-    scared because of Pacman having eaten a power pellet.
+        The code below extracts some useful information from the state, like the
+        remaining food (newFood) and Pacman position after moving (newPos).
+        newScaredTimes holds the number of moves that each ghost will remain
+        scared because of Pacman having eaten a power pellet.
 
-    Print out these variables to see what you're getting, then combine them
-    to create a masterful evaluation function.
-    """
-    # Useful information you can extract from a GameState (pacman.py)
-    successorGameState = currentGameState.generatePacmanSuccessor(action)
-    newPos = successorGameState.getPacmanPosition()
-    newFood = successorGameState.getFood()
-    newGhostStates = successorGameState.getGhostStates()
-    ghostPosition = successorGameState.getGhostPosition(1)
-    capsulePositionList = successorGameState.getCapsules();
-    ghostDistance = math.sqrt(math.pow(newPos[1]-ghostPosition[1],2) + math.pow(newPos[0]-ghostPosition[0],2));
+        Print out these variables to see what you're getting, then combine them
+        to create a masterful evaluation function.
+        """
+        # Useful information you can extract from a GameState (pacman.py)
+        successorGameState = currentGameState.generatePacmanSuccessor(action)
+        newPos = successorGameState.getPacmanPosition()
+        newFood = successorGameState.getFood()
+        newGhostStates = successorGameState.getGhostStates()
+        ghostPosition = successorGameState.getGhostPosition(1)
+        capsulePositionList = successorGameState.getCapsules();
+        ghostDistance = math.sqrt(math.pow(newPos[1]-ghostPosition[1],2) + math.pow(newPos[0]-ghostPosition[0],2));
 
-    # Go eat the capsule first
-    if (len(capsulePositionList)!=0):
-        capsulePositions = capsulePositionList[0]
+        # Go eat the capsule first
+        if (len(capsulePositionList)!=0):
+            capsulePositions = capsulePositionList[0]
 
-        print "CapsulePositions:", capsulePositions
-        capsuleDistance = math.sqrt(math.pow(newPos[1]-capsulePositions[1],2) + math.pow(newPos[0]-capsulePositions[0],2));
-        newScore = 0.40*successorGameState.getScore() + 0.30*ghostDistance - 0.30*capsuleDistance ;
-        print "Pacman :",newPos," Ghost: ",ghostPosition, "Distance: ",ghostDistance, "GameStatescore: ",successorGameState.getScore(), "New Score: ",newScore
-        #print newScaredTimes
-        return newScore
-    else:
-
-        # Chase ghost if ghost is scared
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
-        print "Scared Times: ",newScaredTimes
-        if (newScaredTimes[0] > 0):
-            newScore = 0.60*successorGameState.getScore() - 0.40*ghostDistance;
-
-        # Eat remaining food if not scared.
+            print "CapsulePositions:", capsulePositions
+            capsuleDistance = math.sqrt(math.pow(newPos[1]-capsulePositions[1],2) + math.pow(newPos[0]-capsulePositions[0],2));
+            newScore = 0.40*successorGameState.getScore() + 0.30*ghostDistance - 0.30*capsuleDistance ;
+            print "Pacman :",newPos," Ghost: ",ghostPosition, "Distance: ",ghostDistance, "GameStatescore: ",successorGameState.getScore(), "New Score: ",newScore
+            #print newScaredTimes
+            return newScore
         else:
-            newScore = 0.30*successorGameState.getScore() + 0.20*ghostDistance-0.45*successorGameState.getNumFood();
+
+            # Chase ghost if ghost is scared
+            newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+            print "Scared Times: ",newScaredTimes
+            if (newScaredTimes[0] > 0):
+                newScore = 0.60*successorGameState.getScore() - 0.40*ghostDistance;
+
+            # Eat remaining food if not scared.
+            else:
+                newScore = 0.30*successorGameState.getScore() + 0.20*ghostDistance-0.45*successorGameState.getNumFood();
+
+
+            return newScore
 
 
         return newScore
-
-
-    return newScore
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -149,109 +149,98 @@ class MultiAgentSearchAgent(Agent):
         self.depth = int(depth)
 
 class MinimaxAgent(MultiAgentSearchAgent):
-    """
-      Your minimax agent (question 2)
-    """
-
     def getAction(self, gameState):
-        """
-          Returns the minimax action from the current gameState using self.depth
-          and self.evaluationFunction.
 
-          Here are some method calls that might be useful when implementing minimax.
-
-          gameState.getLegalActions(agentIndex):
-            Returns a list of legal actions for an agent
-            agentIndex=0 means Pacman, ghosts are >= 1
-
-          gameState.generateSuccessor(agentIndex, action):
-            Returns the successor game state after an agent takes an action
-
-          gameState.getNumAgents():
-            Returns the total number of agents in the game
-        """
-        "*** YOUR CODE HERE ***"
-        """
+        # Variables
         numberOfAgents = gameState.getNumAgents();
-    agentCycle = []
-    for i in range(self.depth):
-        for j in range(numberOfAgents):
-            agentCycle.append(j);
-    print agentCycle
-    agentTracker=0
-    depth = 0
-    maxDepth = len(agentCycle)-1
-    maxDepthReached = False
-    state = gameState
+        agentCycle = []
+        for i in range(self.depth):
+            for j in range(numberOfAgents):
+                agentCycle.append(j);
+        print agentCycle
+        agentTracker=0
+        depth = 0
+        maxDepth = len(agentCycle)-1
+        #maxDepthReached = False
+        state = gameState
 
-    def recursiveMax(depth,state,agentTracker,agentCycle,maxDepthReached):
-        print "\nrecursiveMax: "
-        print "depth: ",depth
-        print "agentTracker: ",agentTracker
-        print "agentCycle[agentTracker] :",agentCycle[agentTracker]
+        # Variables Used in Recursion
+        # depth
+        # state
+        # agentTracker
+        # agentCycle
 
-        if (depth == maxDepth):
-            maxDepthReached = True;
-            print "Utility:",scoreEvaluationFunction(state)
-            return scoreEvaluationFunction(state)
+        def recursiveMax(depth,state,agentTracker,agentCycle):
+            print "\nrecursiveMax: "
+            print "depth: ",depth
+            print "agentTracker: ",agentTracker
+            print "agentCycle[agentTracker] :",agentCycle[agentTracker]
 
-        else:
-            successors = []
-            legalActions = state.getLegalActions(agentCycle[agentTracker]);
-            print "actions:",legalActions
-            for i in legalActions:
-                successors.append(state.generateSuccessor(agentCycle[agentTracker],i));
+            if (depth == maxDepth):
+                print "Terminal State reached"
+                return scoreEvaluationFunction(state)
 
-            depth = depth + 1
-            agentTracker=agentTracker+1;
+            else:
+                successors = []
+                legalActions = state.getLegalActions(agentCycle[agentTracker]);
+                print "actions:",legalActions
+                for i in legalActions:
+                    successors.append(state.generateSuccessor(agentCycle[agentTracker],i));
 
-
-            successorUtilities = [];
-            for i in successors:
-                successorUtilities.append(recursiveMin(depth,i,agentTracker,agentCycle,maxDepthReached))
-            print successorUtilities
-            if (maxDepthReached==True):
-                maxValue = max(successorUtilities)
-                actionIndex = successorUtilities.index(maxValue);
-                action = legalActions(actionIndex);
-                return maxValue
-
-    def recursiveMin(depth,state,agentTracker,agentCycle,maxDepthReached):
-        print "\nrecursiveMin: "
-        print "depth: ",depth
-        print "agentTracker: ",agentTracker
-        print "agentCycle[agentTracker] :",agentCycle[agentTracker]
-
-        if (depth == maxDepth):
-            maxDepthReached = True;
-            print "Utility:",scoreEvaluationFunction(state)
-            return scoreEvaluationFunction(state)
-
-        else:
-            successors = []
-            legalActions = state.getLegalActions(agentCycle[agentTracker]);
-            print "actions:",legalActions
-            for i in legalActions:
-                successors.append(state.generateSuccessor(agentCycle[agentTracker],i));
-
-            depth = depth + 1
-            agentTracker=agentTracker+1;
-
-            successorUtilities = [];
-            for i in successors:
-                if (agentCycle[agentTracker]!= 0):
-                    successorUtilities.append(recursiveMin(depth,i,agentTracker,agentCycle,maxDepthReached))
+                # Setup Variable to make recursive call
+                nextDepth = depth + 1
+                nextAgentTracker=agentTracker+1;
+                successorUtilities = [];
+                if (nextAgentTracker<len(agentCycle)):
+                    for i in successors:
+                        successorUtilities.append(recursiveMin(nextDepth,i,nextAgentTracker,agentCycle))
+                    print successorUtilities
+                    maxValue = max(successorUtilities)
+                    actionIndex = successorUtilities.index(maxValue);
+                    action = legalActions[actionIndex];
+                    return maxValue
                 else:
-                    successorUtilities.append(recursiveMax(depth,i,agentTracker,agentCycle,maxDepthReached))
-            print successorUtilities
-            if (maxDepthReached==True):
-                minValue = min(successorUtilities)
-                actionIndex = successorUtilities.index(minValue);
-                action = legalActions(actionIndex);
-                return minValue
+                    print "ERROR TRYING TO EXPAND TERMINAL STATE    "
 
-    print recursiveMax(0,state,agentTracker,agentCycle,maxDepthReached)
-    """
+        def recursiveMin(depth,state,agentTracker,agentCycle):
+            print "\nrecursiveMin: "
+            print "depth: ",depth
+            print "agentTracker: ",agentTracker
+            print "agentCycle[agentTracker] :",agentCycle[agentTracker]
+
+            if (depth == maxDepth):
+                print "Terminal Depth Reached";
+                return scoreEvaluationFunction(state)
+
+            else:
+                successors = []
+                legalActions = state.getLegalActions(agentCycle[agentTracker]);
+                for i in legalActions:
+                    successors.append(state.generateSuccessor(agentCycle[agentTracker],i));
+
+                # Setup Variables to make recursive call
+                nextDepth = depth + 1
+                nextAgentTracker=agentTracker+1;
+
+                if (nextAgentTracker<len(agentCycle)):
+                    successorUtilities = [];
+                    for i in successors:
+                        if (agentCycle[nextAgentTracker]!= 0):
+                            successorUtilities.append(recursiveMin(nextDepth,i,nextAgentTracker,agentCycle))
+                        else:
+                            successorUtilities.append(recursiveMax(nextDepth,i,nextAgentTracker,agentCycle))
+                    print "Successor Utilities",successorUtilities
+                    minValue = min(successorUtilities)
+                    actionIndex = successorUtilities.index(minValue);
+                    action = legalActions[actionIndex];
+                    return minValue
+                else:
+                    print "ERROR TRYING TO EXPAND TERMINAL STATE";
+
+        print recursiveMax(0,state,agentTracker,agentCycle)
+        return
+        util.raiseNotDefined()
+
     pacman = 0
     ghost = 1
 
@@ -284,46 +273,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 best_action = a
             return best_action
 
-    max_value(gameState, game_depth, pacman)
-        """
+    #max_value(gameState, game_depth, pacman)
 
-        pacman = 0
-        ghost = 1
-
-        def max_value(state,depth,agent):
-            if state:  #if state is terminal
-                print "return utility(state)"
-            print "define best_action default somehow"
-            best_value = float("-inf")
-            actions = state.getLegalActions(agent)
-            for action in actions:
-                value = min_value(state.generateSuccessor(agent, action),depth,ghost)
-                if value > best_value:
-                    best_value = value
-                    best_action = action
-            return best_action
-
-        def min_value(state,depth,agent):
-            if state: #if state is terminal
-                print "return utility(state)"
-            print "define best_action default somehow"
-            ghost_agent = agent
-            agent = agent + 1
-            if agent == state.getNumAgents() - 1: #num of ghosts (-1 for pacman)
-                print "return state value"
-            else:
-                best_value = float("inf")
-                actions = state.getLegalActions(ghost)
-                for action in actions:
-                    value = min_value(state.generateSuccessor(ghost, action),depth,ghost_agent)
-                    if value < best_value:
-                        best_value = value
-                        best_action = action
-                return best_action
-
-        max_value(gameState, game_depth, pacman)
-
-        util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
