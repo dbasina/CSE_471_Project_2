@@ -185,10 +185,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
             print "define best_action default somehow"
             best_value = float("-inf")
             actions = state.getLegalActions(agent)
-            for a in actions:
-                value = min_value(state.generateSuccessor(agent, a),depth,ghost)
-                best_value = max(best_value, value)
-                best_action = a
+            for action in actions:
+                value = min_value(state.generateSuccessor(agent, action),depth,ghost)
+                if value > best_value:
+                    best_value = value
+                    best_action = action
             return best_action
 
         def min_value(state,depth,agent):
@@ -202,10 +203,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
             else:
                 best_value = float("inf")
                 actions = state.getLegalActions(ghost)
-                for a in actions:
-                    value = min_value(state.generateSuccessor(ghost, a),depth,ghost_agent)
-                    best_value = min(best_value, value)
-                    best_action = a
+                for action in actions:
+                    value = min_value(state.generateSuccessor(ghost, action),depth,ghost_agent)
+                    if value < best_value:
+                        best_value = value
+                        best_action = action
                 return best_action
 
         max_value(gameState, game_depth, pacman)
@@ -216,53 +218,54 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
       Your minimax agent with alpha-beta pruning (question 3)
     """
-
-    pacman = 0
-    ghosts = 1
-    state = gameState
     def getAction(self, gameState):
         """
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
         pacman = 0
+        ghost = 1
+        a = float("-inf")
+        b = float("inf")
 
-        #unfinished
-        """
-        def max_value(state,depth, alpha, beta,agent):
+        def max_value(state,depth,alpha,beta,agent):
             if state:  #if state is terminal
                 print "return utility(state)"
+            print "define best_action default somehow"
             best_value = float("-inf")
             actions = state.getLegalActions(agent)
-            print "define best_action default somehow"
-            for a in actions:
-                value = min_value(state.generateSuccessor(agent, a))
-                best_value = max(best_value, value)
-                best_action = a
+            for action in actions:
+                value = min_value(state.generateSuccessor(agent, action),depth,alpha,beta,ghost)
+                if value > best_value:
+                    best_action = action
+                    best_value = value
                 if best_value >= beta:
                     return best_action
                 alpha = max(alpha, best_value)
             return best_action
 
-        def min_value(state, alpha, beta):
-            if state:  # if terminal
+        def min_value(state,depth,alpha,beta,agent):
+            if state: #if state is terminal
                 print "return utility(state)"
-            ghost = ghost + 1
-            best_value = float("inf")
-            actions = state.getLegalActions(pacman)
-            for a in actions:
-                if ghost != 5:  # bc there's 4 ghosts, so iterate 4 times?
-                    value = minValue(state.generateSuccessor(ghost, a))
+            print "define best_action default somehow"
+            ghost_agent = agent
+            agent = agent + 1
+            if agent == state.getNumAgents() - 1: #num of ghosts (-1 for pacman)
+                print "return state value"
+            else:
+                best_value = float("inf")
+                actions = state.getLegalActions(ghost)
+                for action in actions:
+                    value = min_value(state.generateSuccessor(ghost, action),depth,alpha,beta,ghost_agent)
                     best_value = min(best_value, value)
-                else:  # if on the last ghost
-                    print "do something"
-            if best_value <= alpha:
-                return best_value
-            beta = min(beta, best_value)
-            return best_value
+                    best_action = action
+                    if best_value <= alpha:
+                        return best_value
+                    beta = min(beta, best_value)
+                return best_action
 
-        max_value(gameState,depth,alpha,beta,agent)
-        """
+        max_value(gameState,depth,a,b,pacman)
+
         util.raiseNotDefined()
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
