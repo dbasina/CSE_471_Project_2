@@ -319,16 +319,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         # agentTracker
         # agentCycle
 
-<<<<<<< HEAD
-        def recursiveMax(depth, state, agentTracker, agentCycle, alpha, beta):
-            print "recursiveMax"
-            legalActions = state.getLegalActions(agentCycle[agentTracker])
-            if len(legalActions) == 0:
-=======
         def recursiveMax(depth, state, agentTracker, alpha, beta):
             legalActions = state.getLegalActions(agentTracker)
             if state.isWin() or state.isLose():
->>>>>>> 29a289c7f2872bc090a4e10a07ecc6bd0b946cb2
                 return scoreEvaluationFunction(state)
             # Setup Variable to make recursive call
             nextAgentTracker = agentTracker + 1
@@ -348,18 +341,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             return maxValue
 
 
-<<<<<<< HEAD
-        def recursiveMin(depth, state, agentTracker, agentCycle, alpha, beta):
-            print "recursiveMin"
-            if (depth == maxDepth - 1):
-                return scoreEvaluationFunction(state)
-            legalActions = state.getLegalActions(agentCycle[agentTracker])
-            if len(legalActions) == 0:
-=======
         def recursiveMin(depth, state, agentTracker, alpha, beta):
             legalActions = state.getLegalActions(agentTracker)
             if state.isWin() or state.isLose():
->>>>>>> 29a289c7f2872bc090a4e10a07ecc6bd0b946cb2
                 # print "State has no legal Actions"
                 return scoreEvaluationFunction(state)
             # Setup Variables to make recursive call
@@ -389,135 +373,6 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
     def getAction(self, gameState):
 
-        # Variables
-        numberOfAgents = gameState.getNumAgents();
-        agentCycle = []
-        for i in range(self.depth):
-            for j in range(numberOfAgents):
-                agentCycle.append(j);
-        agentCycle.append(0);
-        #print agentCycle
-        #print gameState.isWin();
-        #print gameState.isLose();
-        #print "Max Depth = ",self.depth
-        agentTracker=0
-        depth = 0
-        maxDepth = len(agentCycle)-1
-        #maxDepthReached = False
-        state = gameState
-        actions=gameState.getLegalActions()
-        # Variables Used in Recursion
-        # depth
-        # state
-        # agentTracker
-        # agentCycle
-
-        def recursiveMax(depth,state,agentTracker,agentCycle):
-             print "\nrecursiveMax: "
-             print "depth: ",depth
-             print "agentTracker: ",agentTracker
-             print "agentCycle[agentTracker] :",agentCycle[agentTracker]
-
-            if (depth == maxDepth):
-                return (scoreEvaluationFunction(state),'NONE')
-
-
-            else:
-                successors = []
-                legalActions = state.getLegalActions(agentCycle[agentTracker]);
-                if (len(legalActions)>0):
-                    print "actions:",legalActions
-                    for i in legalActions:
-                        successors.append(state.generateSuccessor(agentCycle[agentTracker],i));
-
-                    # Setup Variable to make recursive call
-                    nextDepth = depth + 1
-                    nextAgentTracker=agentTracker+1;
-                    successorUtilities = [];
-                    if (nextAgentTracker<len(agentCycle)):
-                        for i in successors:
-                            successorUtilities.append(recursiveMin(nextDepth,i,nextAgentTracker,agentCycle))
-
-                    else:
-                        print "ERROR TRYING TO EXPAND TERMINAL STATE"
-
-                     print "\nBACK FROM RECURSION AT STATE:"
-                     print "recursiveMin: "
-                     print "depth: ",depth
-                     print "agentTracker: ",agentTracker
-                     print "agentCycle[agentTracker] :",agentCycle[agentTracker]
-                     print "Successor Utilities",successorUtilities
-                     print "\n"
-                    weightedUtilities=[]
-                    for i in range(len(legalActions)):
-                        util = successorUtilities[i]
-                        weightUtil = util[0] * (1.0/float(len(legalActions)))
-                        weightedUtilities.append(weightUtil)
-                    print weightedUtilities
-                    maxValue = max(weightedUtilities)
-                    actionIndex = weightedUtilities.index(maxValue);
-                    action = legalActions[actionIndex]
-                    return (maxValue,action)
-                else:
-                    print "State has no legal Actions"
-                    return (scoreEvaluationFunction(state), 'NONE')
-
-        def recursiveMin(depth,state,agentTracker,agentCycle):
-
-             print "\nrecursiveMin: "
-             print "depth: ",depth
-             print "agentTracker: ",agentTracker
-             print "agentCycle[agentTracker] :",agentCycle[agentTracker]
-
-            if (depth == maxDepth):
-                return (scoreEvaluationFunction(state),'NONE')
-
-            else:
-                successors = []
-                legalActions = state.getLegalActions(agentCycle[agentTracker]);
-                if (len(legalActions)>0):
-                    print "actions:",legalActions
-
-                    for i in legalActions:
-                        successors.append(state.generateSuccessor(agentCycle[agentTracker],i));
-
-                    # Setup Variables to make recursive call
-                    nextDepth = depth + 1
-                    nextAgentTracker=agentTracker+1;
-                    successorUtilities = [];
-                    if (nextAgentTracker<len(agentCycle)):
-                        for i in successors:
-                            if (agentCycle[nextAgentTracker]!= 0):
-                                successorUtilities.append(recursiveMin(nextDepth,i,nextAgentTracker,agentCycle))
-                            else:
-                                successorUtilities.append(recursiveMax(nextDepth,i,nextAgentTracker,agentCycle))
-                    else:
-                        print "ERROR TRYING TO EXPAND TERMINAL STATE";
-
-                    print "\nBACK FROM RECURSION AT STATE:"
-                    print "recursiveMin: "
-                    print "depth: ",depth
-                    print "agentTracker: ",agentTracker
-                    print "agentCycle[agentTracker] :",agentCycle[agentTracker]
-                    print "Successor Utilities",successorUtilities
-                    print "\n"
-                    weightedUtilities=[]
-                    for i in range(len(legalActions)):
-                        util = successorUtilities[i]
-                        weightUtil = util[0] * (1.0/float(len(legalActions)))
-                        weightedUtilities.append(weightUtil)
-                    print weightedUtilities
-                    minValue = min(weightedUtilities)
-                    actionIndex = weightedUtilities.index(minValue);
-                    action = legalActions[actionIndex];
-                    return (minValue,action)
-                else:
-                    #print "State has no legal Actions"
-                    return (scoreEvaluationFunction(state),'NONE')
-
-        a = recursiveMax(0,state,agentTracker,agentCycle)
-        print a[1]
-        return a[1]
         util.raiseNotDefined()
 
 def betterEvaluationFunction(currentGameState):
