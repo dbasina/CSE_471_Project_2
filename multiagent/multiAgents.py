@@ -157,13 +157,14 @@ class MinimaxAgent(MultiAgentSearchAgent):
         for i in range(self.depth):
             for j in range(numberOfAgents):
                 agentCycle.append(j);
+        agentCycle.append(0);
         print agentCycle
         print gameState.isWin();
         print gameState.isLose();
         print "Max Depth = ",self.depth
         agentTracker=0
         depth = 0
-        maxDepth = len(agentCycle)
+        maxDepth = len(agentCycle)-1
         #maxDepthReached = False
         state = gameState
         actions=gameState.getLegalActions()
@@ -180,7 +181,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
             #print "agentCycle[agentTracker] :",agentCycle[agentTracker]
 
             if (depth == maxDepth):
-                print "Terminal State reached"
                 return scoreEvaluationFunction(state)
 
 
@@ -225,7 +225,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
             #print "agentCycle[agentTracker] :",agentCycle[agentTracker]
 
             if (depth == maxDepth):
-                print "Terminal State reached"
                 return scoreEvaluationFunction(state)
 
             else:
