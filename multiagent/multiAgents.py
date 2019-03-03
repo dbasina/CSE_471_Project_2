@@ -370,10 +370,63 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     """
       Your expectimax agent (question 4)
     """
-
     def getAction(self, gameState):
 
-        util.raiseNotDefined()
+        # Variables
+        numberOfAgents = gameState.getNumAgents()
+        agentTracker = 0
+        maxDepth = self.depth
+
+        # Variables Used in Recursion
+        # depth
+        # state
+        # agentTracker
+        # agentCycle
+
+        def recursiveMax(depth, state, agentTracker):
+            legalActions = state.getLegalActions(agentTracker)
+            if state.isWin() or state.isLose():
+                return scoreEvaluationFunction(state)
+            # Setup Variable to make recursive call
+            nextAgentTracker = agentTracker + 1
+            maxValue = float("-inf")
+            for i in legalActions:
+                value = recursiveMin(depth, state.generateSuccessor(agentTracker, i), nextAgentTracker)
+                if value > maxValue:
+                    maxValue = value
+                    action = i
+
+            if depth == 0:
+                return action
+
+            return maxValue
+
+        def recursiveMin(depth, state, agentTracker):
+            legalActions = state.getLegalActions(agentTracker)
+            if state.isWin() or state.isLose():
+                # print "State has no legal Actions"
+                return scoreEvaluationFunction(state)
+            # Setup Variables to make recursive call
+            nextAgentTracker = (agentTracker + 1) % numberOfAgents
+            minValue = float("inf")
+            computed_value = 0.0
+            for i in legalActions:
+                if nextAgentTracker != 0:
+                    value = recursiveMin(depth, state.generateSuccessor(agentTracker, i), nextAgentTracker)
+                    computed_value += value * (1.0/float(len(legalActions)))
+                else:
+                    if depth == maxDepth - 1:
+                        value = scoreEvaluationFunction(state.generateSuccessor(agentTracker, i))
+                        computed_value += value * (1.0 / float(len(legalActions)))
+                    else:
+                        value = recursiveMax(depth + 1, state.generateSuccessor(agentTracker, i), nextAgentTracker)
+                        computed_value += value * (1.0 / float(len(legalActions)))
+            minValue = min(minValue, computed_value)
+
+            return minValue
+
+        a = recursiveMax(0, gameState, agentTracker)
+        return a
 
 def betterEvaluationFunction(currentGameState):
     """
