@@ -85,58 +85,31 @@ class ReflexAgent(Agent):
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newGhostStates = successorGameState.getGhostStates()
         ghostPosition = successorGameState.getGhostPosition(1)
+        legalActions = successorGameState.getLegalActions()
 
+        currentPos = successorGameState .getPacmanPosition()
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
         foodList = newFood.asList();
 
         foodPenalty=0
         deathPenalty=1500
-
+        stillPenalty = 100;
         for i in foodList:
             xpos = i[0]
             ypos = i[1]
             if (newFood[xpos][ypos] == True):
                 foodPenalty = foodPenalty+1
-        foodPosition= foodList[0]
-        capsulePositionList = successorGameState.getCapsules();
+        newScore = 10000 - foodPenalty
+        if (newPos==successorGameState.getPacmanPosition):
+            newScore = 10000-stillPenalty
+        # Check if ghost can come close to us
+        for i in legalActions:
+            possibleState = successorGameState.generatePacmanSuccessor(i)
 
+            if (possibleState.getGhostPosition(1)==newPos):
+                newScore = -1000
 
-        if (len(capsulePositionList)!=0):
-            capsulePositions = capsulePositionList[0]
-
-            foodDistance = math.sqrt(math.pow(newPos[1]-foodPosition[1],2) + math.pow(newPos[0]-foodPosition[0],2));
-            ghostDistance = math.sqrt(math.pow(newPos[1]-ghostPosition[1],2) + math.pow(newPos[0]-ghostPosition[0],2));
-            capsuleDistance = math.sqrt(math.pow(newPos[1]-capsulePositions[1],2) + math.pow(newPos[0]-capsulePositions[0],2));
-
-            newScore =  1000- foodPenalty
-
-            if (newPos == ghostPosition):
-                newScore = deathPenalty
-            neighbouringpositions = [newFood[newPos[0]+1][newPos[1]] , newFood[newPos[0]-1][newPos[1]],newFood[newPos[0]][newPos[1]+1],newFood[newPos[0]][newPos[1]-1]]
-            foodNearby = False
-
-            for i in neighbouringpositions:
-                if (i == True):
-                    foodNearby = True
-            #if (foodNearby==False):
-                #newScore = -foodDistance
-            print "CapsulePositions:", capsulePositions
-
-
-
-
-        else:
-
-            # Chase ghost if ghost is scared
-            newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
-            print "Scared Times: ",newScaredTimes
-            if (newScaredTimes[0] > 0):
-                newScore = (100-1.8*ghostDistance) + foodDistance
-
-            # Eat remaining food if not scared.
-            else:
-                newScore = -(100+ghostDistance) + 2**foodDistance;
         return newScore
 
 def scoreEvaluationFunction(currentGameState):
@@ -330,7 +303,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
     Your minimax agent with alpha-beta pruning (question 3)
     """
-        """
+    """
     Your minimax agent with alpha-beta pruning (question 3)
     """
     def getAction(self, gameState):
