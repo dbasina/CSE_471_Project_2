@@ -171,20 +171,20 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # agentCycle
 
         def recursiveMax(depth,state,agentTracker,agentCycle):
-            #print "\nrecursiveMax: "
-            #print "depth: ",depth
-            #print "agentTracker: ",agentTracker
-            #print "agentCycle[agentTracker] :",agentCycle[agentTracker]
+            print "\nrecursiveMax: "
+            print "depth: ",depth
+            print "agentTracker: ",agentTracker
+            print "agentCycle[agentTracker] :",agentCycle[agentTracker]
 
             if (depth == maxDepth):
-                #print "Terminal State reached"
+                print "Terminal State reached"
                 return scoreEvaluationFunction(state)
 
             else:
                 successors = []
                 legalActions = state.getLegalActions(agentCycle[agentTracker]);
                 if (len(legalActions)>0):
-                    #print "actions:",legalActions
+                    print "actions:",legalActions
                     for i in legalActions:
                         successors.append(state.generateSuccessor(agentCycle[agentTracker],i));
 
@@ -199,24 +199,26 @@ class MinimaxAgent(MultiAgentSearchAgent):
                     else:
                         print "ERROR TRYING TO EXPAND TERMINAL STATE"
 
-                    #print "\nBACK FROM RECURSION AT STATE:"
-                    #print "recursiveMin: "
-                    #print "depth: ",depth
-                    #print "agentTracker: ",agentTracker
-                    #print "agentCycle[agentTracker] :",agentCycle[agentTracker]
-                    #print "Successor Utilities",successorUtilities
-                    #print "\n"
+                    print "\nBACK FROM RECURSION AT STATE:"
+                    print "recursiveMin: "
+                    print "depth: ",depth
+                    print "agentTracker: ",agentTracker
+                    print "agentCycle[agentTracker] :",agentCycle[agentTracker]
+                    print "Successor Utilities",successorUtilities
+                    print "\n"
                     maxValue = max(successorUtilities)
                     actionIndex = successorUtilities.index(maxValue);
                     action = legalActions[actionIndex]
                     return (maxValue,action)
-                else: print "State has no legal Actions"
+                else:
+                    print "State has no legal Actions"
+                    return scoreEvaluationFunction(state)
 
         def recursiveMin(depth,state,agentTracker,agentCycle):
-            #print "\nrecursiveMin: "
-            #print "depth: ",depth
-            #print "agentTracker: ",agentTracker
-            #print "agentCycle[agentTracker] :",agentCycle[agentTracker]
+            print "\nrecursiveMin: "
+            print "depth: ",depth
+            print "agentTracker: ",agentTracker
+            print "agentCycle[agentTracker] :",agentCycle[agentTracker]
 
             if (depth == maxDepth):
                 print "Terminal Depth Reached";
@@ -226,7 +228,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 successors = []
                 legalActions = state.getLegalActions(agentCycle[agentTracker]);
                 if (len(legalActions)>0):
-                    #print "actions:",legalActions
+                    print "actions:",legalActions
 
                     for i in legalActions:
                         successors.append(state.generateSuccessor(agentCycle[agentTracker],i));
@@ -244,20 +246,21 @@ class MinimaxAgent(MultiAgentSearchAgent):
                     else:
                         print "ERROR TRYING TO EXPAND TERMINAL STATE";
 
-                    #print "\nBACK FROM RECURSION AT STATE:"
-                    #print "recursiveMin: "
-                    #print "depth: ",depth
-                    #print "agentTracker: ",agentTracker
-                    #print "agentCycle[agentTracker] :",agentCycle[agentTracker]
-                    #print "Successor Utilities",successorUtilities
-                    #print "\n"
+                    print "\nBACK FROM RECURSION AT STATE:"
+                    print "recursiveMin: "
+                    print "depth: ",depth
+                    print "agentTracker: ",agentTracker
+                    print "agentCycle[agentTracker] :",agentCycle[agentTracker]
+                    print "Successor Utilities",successorUtilities
+                    print "\n"
 
                     minValue = min(successorUtilities)
                     actionIndex = successorUtilities.index(minValue);
                     action = legalActions[actionIndex];
                     return (minValue,action)
-                else: print "State has no legal Actions"
-
+                else:
+                    print "State has no legal Actions"
+                    return scoreEvaluationFunction(state)
 
         a = recursiveMax(0,state,agentTracker,agentCycle)
         print a[1]
