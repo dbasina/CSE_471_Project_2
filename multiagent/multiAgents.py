@@ -83,39 +83,60 @@ class ReflexAgent(Agent):
         """
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
-        newPos = successorGameState.getPacmanPosition()
-        newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
         ghostPosition = successorGameState.getGhostPosition(1)
-        capsulePositionList = successorGameState.getCapsules();
-        ghostDistance = math.sqrt(math.pow(newPos[1]-ghostPosition[1],2) + math.pow(newPos[0]-ghostPosition[0],2));
 
-        # Go eat the capsule first
+        newPos = successorGameState.getPacmanPosition()
+        newFood = successorGameState.getFood()
+        foodList = newFood.asList();
+
+        foodPenalty=0
+        deathPenalty=1500
+
+        for i in foodList:
+            xpos = i[0]
+            ypos = i[1]
+            if (newFood[xpos][ypos] == True):
+                foodPenalty = foodPenalty+1
+        foodPosition= foodList[0]
+        capsulePositionList = successorGameState.getCapsules();
+
+
         if (len(capsulePositionList)!=0):
             capsulePositions = capsulePositionList[0]
 
-            print "CapsulePositions:", capsulePositions
+            foodDistance = math.sqrt(math.pow(newPos[1]-foodPosition[1],2) + math.pow(newPos[0]-foodPosition[0],2));
+            ghostDistance = math.sqrt(math.pow(newPos[1]-ghostPosition[1],2) + math.pow(newPos[0]-ghostPosition[0],2));
             capsuleDistance = math.sqrt(math.pow(newPos[1]-capsulePositions[1],2) + math.pow(newPos[0]-capsulePositions[0],2));
-            newScore = 0.40*successorGameState.getScore() + 0.30*ghostDistance - 0.30*capsuleDistance ;
-            print "Pacman :",newPos," Ghost: ",ghostPosition, "Distance: ",ghostDistance, "GameStatescore: ",successorGameState.getScore(), "New Score: ",newScore
-            #print newScaredTimes
-            return newScore
+
+            newScore =  1000- foodPenalty
+
+            if (newPos == ghostPosition):
+                newScore = deathPenalty
+            neighbouringpositions = [newFood[newPos[0]+1][newPos[1]] , newFood[newPos[0]-1][newPos[1]],newFood[newPos[0]][newPos[1]+1],newFood[newPos[0]][newPos[1]-1]]
+            foodNearby = False
+
+            for i in neighbouringpositions:
+                if (i == True):
+                    foodNearby = True
+            #if (foodNearby==False):
+                #newScore = -foodDistance
+            print "CapsulePositions:", capsulePositions
+
+
+
+
         else:
 
             # Chase ghost if ghost is scared
             newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
             print "Scared Times: ",newScaredTimes
             if (newScaredTimes[0] > 0):
-                newScore = 0.60*successorGameState.getScore() - 0.40*ghostDistance;
+                newScore = (100-1.8*ghostDistance) + foodDistance
 
             # Eat remaining food if not scared.
             else:
-                newScore = 0.30*successorGameState.getScore() + 0.20*ghostDistance-0.45*successorGameState.getNumFood();
-
-
-            return newScore
-
-
+                newScore = -(100+ghostDistance) + 2**foodDistance;
         return newScore
 
 def scoreEvaluationFunction(currentGameState):
@@ -364,13 +385,135 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     """
 
     def getAction(self, gameState):
-        """
-          Returns the expectimax action using self.depth and self.evaluationFunction
 
-          All ghosts should be modeled as choosing uniformly at random from their
-          legal moves.
-        """
-        "*** YOUR CODE HERE ***"
+        # Variables
+        numberOfAgents = gameState.getNumAgents();
+        agentCycle = []
+        for i in range(self.depth):
+            for j in range(numberOfAgents):
+                agentCycle.append(j);
+        agentCycle.append(0);
+        #print agentCycle
+        #print gameState.isWin();
+        #print gameState.isLose();
+        #print "Max Depth = ",self.depth
+        agentTracker=0
+        depth = 0
+        maxDepth = len(agentCycle)-1
+        #maxDepthReached = False
+        state = gameState
+        actions=gameState.getLegalActions()
+        # Variables Used in Recursion
+        # depth
+        # state
+        # agentTracker
+        # agentCycle
+
+        def recursiveMax(depth,state,agentTracker,agentCycle):
+            #print "\nrecursiveMax: "
+            #print "depth: ",depth
+            #print "agentTracker: ",agentTracker
+            #print "agentCycle[agentTracker] :",agentCycle[agentTracker]
+
+            if (depth == maxDepth):
+                return (scoreEvaluationFunction(state),'NONE')
+
+
+            else:
+                successors = []
+                legalActions = state.getLegalActions(agentCycle[agentTracker]);
+                if (len(legalActions)>0):
+                    #print "actions:",legalActions
+                    for i in legalActions:
+                        successors.append(state.generateSuccessor(agentCycle[agentTracker],i));
+
+                    # Setup Variable to make recursive call
+                    nextDepth = depth + 1
+                    nextAgentTracker=agentTracker+1;
+                    successorUtilities = [];
+                    if (nextAgentTracker<len(agentCycle)):
+                        for i in successors:
+                            successorUtilities.append(recursiveMin(nextDepth,i,nextAgentTracker,agentCycle))
+
+                    else:
+                        print "ERROR TRYING TO EXPAND TERMINAL STATE"
+
+                    #print "\nBACK FROM RECURSION AT STATE:"
+                    #print "recursiveMin: "
+                    #print "depth: ",depth
+                    #print "agentTracker: ",agentTracker
+                    #print "agentCycle[agentTracker] :",agentCycle[agentTracker]
+                    #print "Successor Utilities",successorUtilities
+                    #print "\n"
+                    weightedUtilities=[]
+                    for i in range(len(legalActions)):
+                        util = successorUtilities[i]
+                        weightUtil = util[0] * (1.0/float(len(legalActions)))
+                        weightedUtilities.append(weightUtil)
+
+                    maxValue = max(weightedUtilities)
+                    actionIndex = weightedUtilities.index(maxValue);
+                    action = legalActions[actionIndex]
+                    return (maxValue,action)
+                else:
+                    #print "State has no legal Actions"
+                    return (scoreEvaluationFunction(state), 'NONE')
+
+        def recursiveMin(depth,state,agentTracker,agentCycle):
+            #print "\nrecursiveMin: "
+            #print "depth: ",depth
+            #print "agentTracker: ",agentTracker
+            #print "agentCycle[agentTracker] :",agentCycle[agentTracker]
+
+            if (depth == maxDepth):
+                return (scoreEvaluationFunction(state),'NONE')
+
+            else:
+                successors = []
+                legalActions = state.getLegalActions(agentCycle[agentTracker]);
+                if (len(legalActions)>0):
+                    #print "actions:",legalActions
+
+                    for i in legalActions:
+                        successors.append(state.generateSuccessor(agentCycle[agentTracker],i));
+
+                    # Setup Variables to make recursive call
+                    nextDepth = depth + 1
+                    nextAgentTracker=agentTracker+1;
+                    successorUtilities = [];
+                    if (nextAgentTracker<len(agentCycle)):
+                        for i in successors:
+                            if (agentCycle[nextAgentTracker]!= 0):
+                                successorUtilities.append(recursiveMin(nextDepth,i,nextAgentTracker,agentCycle))
+                            else:
+                                successorUtilities.append(recursiveMax(nextDepth,i,nextAgentTracker,agentCycle))
+                    else:
+                        print "ERROR TRYING TO EXPAND TERMINAL STATE";
+
+                    #print "\nBACK FROM RECURSION AT STATE:"
+                    #print "recursiveMin: "
+                    #print "depth: ",depth
+                    #print "agentTracker: ",agentTracker
+                    #print "agentCycle[agentTracker] :",agentCycle[agentTracker]
+                    #print "Successor Utilities",successorUtilities
+                    #print "\n"
+                    weightedUtilities=[]
+                    for i in range(len(legalActions)):
+                        util = successorUtilities[i]
+                        weightUtil = util[0] * (1.0/float(len(legalActions)))
+                        weightedUtilities.append(weightUtil)
+
+                    minValue = min(weightedUtilities)
+                    actionIndex = weightedUtilities.index(minValue);
+                    action = legalActions[actionIndex];
+                    return (minValue,action)
+                else:
+                    #print "State has no legal Actions"
+                    return (scoreEvaluationFunction(state),'NONE')
+
+        a = recursiveMax(0,state,agentTracker,agentCycle)
+        print a[1]
+        return a[1]
         util.raiseNotDefined()
 
 def betterEvaluationFunction(currentGameState):
