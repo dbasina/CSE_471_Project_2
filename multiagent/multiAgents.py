@@ -189,6 +189,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         #maxDepthReached = False
         state = gameState
         actions=gameState.getLegalActions()
+
         # Variables Used in Recursion
         # depth
         # state
@@ -330,54 +331,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     Your minimax agent with alpha-beta pruning (question 3)
     """
     def getAction(self, gameState):
-        """
-          Returns the minimax action using self.depth and self.evaluationFunction
-        """
-        "*** YOUR CODE HERE ***"
-        pacman = 0
-        ghost = 1
-        a = float("-inf")
-        b = float("inf")
-
-        def max_value(state,depth,alpha,beta,agent):
-            if state:  #if state is terminal
-                print "return utility(state)"
-            print "define best_action default somehow"
-            best_value = float("-inf")
-            actions = state.getLegalActions(agent)
-            for action in actions:
-                value = min_value(state.generateSuccessor(agent, action),depth,alpha,beta,ghost)
-                if value > best_value:
-                    best_action = action
-                    best_value = value
-                if best_value >= beta:
-                    return best_action
-                alpha = max(alpha, best_value)
-            return best_action
-
-        def min_value(state,depth,alpha,beta,agent):
-            if state: #if state is terminal
-                print "return utility(state)"
-            print "define best_action default somehow"
-            ghost_agent = agent
-            agent = agent + 1
-            if agent == state.getNumAgents() - 1: #num of ghosts (-1 for pacman)
-                print "return state value"
-            else:
-                best_value = float("inf")
-                actions = state.getLegalActions(ghost)
-                for action in actions:
-                    value = min_value(state.generateSuccessor(ghost, action),depth,alpha,beta,ghost_agent)
-                    best_value = min(best_value, value)
-                    best_action = action
-                    if best_value <= alpha:
-                        return best_value
-                    beta = min(beta, best_value)
-                return best_action
-
-        max_value(gameState,depth,a,b,pacman)
-
         util.raiseNotDefined()
+
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
