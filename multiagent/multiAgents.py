@@ -334,48 +334,76 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        pacman = 0
-        ghost = 1
-        a = float("-inf")
-        b = float("inf")
+        # Variables
+        numberOfAgents = gameState.getNumAgents()
+        agentCycle = []
+        for i in range(self.depth):
+            for j in range(numberOfAgents):
+                agentCycle.append(j)
+        agentCycle.append(0)
+        print "agentCycle: ", agentCycle
+        print "isWin: ", gameState.isWin()
+        print "isLose", gameState.isLose()
+        print "Max Depth = ", self.depth
+        agentTracker = 0
+        depth = 0
+        maxDepth = len(agentCycle) - 1
+        state = gameState
+        actions = gameState.getLegalActions()
 
-        def max_value(state,depth,alpha,beta,agent):
-            if state:  #if state is terminal
-                print "return utility(state)"
-            print "define best_action default somehow"
-            best_value = float("-inf")
-            actions = state.getLegalActions(agent)
-            for action in actions:
-                value = min_value(state.generateSuccessor(agent, action),depth,alpha,beta,ghost)
-                if value > best_value:
-                    best_action = action
-                    best_value = value
-                if best_value >= beta:
-                    return best_action
-                alpha = max(alpha, best_value)
-            return best_action
+        # Variables Used in Recursion
+        # depth
+        # state
+        # agentTracker
+        # agentCycle
 
-        def min_value(state,depth,alpha,beta,agent):
-            if state: #if state is terminal
-                print "return utility(state)"
-            print "define best_action default somehow"
-            ghost_agent = agent
-            agent = agent + 1
-            if agent == state.getNumAgents() - 1: #num of ghosts (-1 for pacman)
-                print "return state value"
-            else:
-                best_value = float("inf")
-                actions = state.getLegalActions(ghost)
-                for action in actions:
-                    value = min_value(state.generateSuccessor(ghost, action),depth,alpha,beta,ghost_agent)
-                    best_value = min(best_value, value)
-                    best_action = action
-                    if best_value <= alpha:
-                        return best_value
-                    beta = min(beta, best_value)
-                return best_action
+        def recursiveMax(depth, state, agentTracker, agentCycle, alpha, beta):
+            legalActions = state.getLegalActions(agentCycle[agentTracker])
+            if len(legalActions) == 0:
+                return scoreEvaluationFunction(state)
+            # Setup Variable to make recursive call
+            nextDepth = depth + 1
+            nextAgentTracker = agentTracker + 1
+            maxValue = float("-inf")
+            for i in legalActions:
+                value = recursiveMin(nextDepth, state.generateSuccessor(agentCycle[agentTracker], i), nextAgentTracker, agentCycle, alpha, beta)
+                if value > maxValue:
+                    maxValue = value
+                    action = i
 
-        max_value(gameState,depth,a,b,pacman)
+                if maxValue > beta:
+                    return maxValue
+                alpha = max(alpha, maxValue)
+            if depth == 0:
+                return action
+
+            return maxValue
+
+
+        def recursiveMin(depth, state, agentTracker, agentCycle, alpha, beta):
+            if (depth == maxDepth - 1):
+                return scoreEvaluationFunction(state)
+            legalActions = state.getLegalActions(agentCycle[agentTracker])
+            if len(legalActions) == 0:
+                # print "State has no legal Actions"
+                return scoreEvaluationFunction(state)
+            # Setup Variables to make recursive call
+            nextDepth = depth + 1
+            nextAgentTracker = agentTracker + 1
+            minValue = float("inf")
+            for i in legalActions:
+                if (agentCycle[nextAgentTracker] != 0):
+                    value = recursiveMin(depth, state.generateSuccessor(agentCycle[agentTracker], i), nextAgentTracker, agentCycle, alpha, beta)
+                else:
+                    value = recursiveMax(nextDepth, state.generateSuccessor(agentCycle[agentTracker], i), nextAgentTracker, agentCycle, alpha, beta)
+                minValue = min(minValue, value)
+                if minValue <= alpha:
+                    return minValue
+                beta = min(beta, minValue)
+            return minValue
+
+        a = recursiveMax(0, state, agentTracker, agentCycle, float("-inf"), float("inf"))
+        return a
 
         util.raiseNotDefined()
 
