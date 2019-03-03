@@ -104,7 +104,7 @@ class ReflexAgent(Agent):
         winReward = 5.0
         loseReward = -5.0
         livingReward = -0.05
-        foodReward = 0.02
+        foodReward = 0.01
         closerToFoodReward = 0.01
         stillReward = -0.01
         loseReward = -1
@@ -113,7 +113,7 @@ class ReflexAgent(Agent):
         closerToCapsuleReward = 0.02
         eatGhostReward= 2.0
         ghostInRadiusReward = -0.05
-        ghostNotInRadiusReward = 0.01
+        ghostNotInRadiusReward = 0.03
         ghostChasingReward = -0.02
         #set livingReward
         newScore = livingReward
@@ -140,7 +140,7 @@ class ReflexAgent(Agent):
         if (successorPosition==currentPosition):
             newScore = newScore + stillReward
 
-        #ghostChasingReward
+        #ghostChasingReward mess around with ghost for a bit
         if (currentPosition == successorGhostPosition):
             newScore = newScore +ghostChasingReward
 
@@ -193,8 +193,9 @@ class ReflexAgent(Agent):
             currentFoodDistance = math.sqrt(math.pow((currentPosition[0] - nearestFoodPosition[0]),2) + math.pow(currentPosition[1] - nearestFoodPosition[1],2))
             successorFoodDistance = math.sqrt(math.pow((successorPosition[0] - nearestFoodPosition[0]),2) + math.pow(successorPosition[1] - nearestFoodPosition[1],2))
             if(successorFoodDistance<currentFoodDistance):
-                if(successorPosition!=successorGhostPosition):
-                    if(successorPosition!=currentGhostPosition):
+                currentGhostDistance = math.sqrt(math.pow((currentPosition[0] - currentGhostPosition[0]),2) + math.pow(currentPosition[1] - currentGhostPosition[1],2))
+                successorGhostDistance = math.sqrt(math.pow((successorPosition[0] - successorGhostPosition[0]),2) + math.pow(successorPosition[1] - successorGhostPosition[1],2))
+                if(successorGhostDistance>2):
                         newScore = newScore + closerToFoodReward
 
         return newScore
