@@ -82,33 +82,120 @@ class ReflexAgent(Agent):
         to create a masterful evaluation function.
         """
         # Useful information you can extract from a GameState (pacman.py)
+        currentGhostStates = currentGameState.getGhostStates()
+        currentScaredTimes = [ghostState.scaredTimer for ghostState in currentGhostStates]
+        #Current data
+        currentPosition = currentGameState.getPacmanPosition()
+        currentFood = currentGameState.getFood()
+        currentFoodList = currentFood.asList();
+        currentCapsule = currentGameState.getCapsules();
+        currentGhostPosition = currentGameState.getGhostPosition(1)
+
+        #Successor data
         successorGameState = currentGameState.generatePacmanSuccessor(action)
-        newGhostStates = successorGameState.getGhostStates()
-        ghostPosition = successorGameState.getGhostPosition(1)
-        legalActions = successorGameState.getLegalActions()
+        successorGhostStates = successorGameState.getGhostStates()
+        successorGhostPosition = successorGameState.getGhostPosition(1)
+        successorLegalActions = successorGameState.getLegalActions()
+        successorPosition = successorGameState.getPacmanPosition()
+        successorNumFood = successorGameState.getNumFood();
+        successorCapsule = successorGameState.getCapsules();
 
-        currentPos = successorGameState .getPacmanPosition()
-        newPos = successorGameState.getPacmanPosition()
-        newFood = successorGameState.getFood()
-        foodList = newFood.asList();
+        # rewards
+        winReward = 5.0
+        loseReward = -5.0
+        livingReward = -0.05
+        foodReward = 0.02
+        closerToFoodReward = 0.01
+        stillReward = -0.01
+        loseReward = -1
+        winReward = 1
+        capsuleReward = 2.0
+        closerToCapsuleReward = 0.02
+        eatGhostReward= 2.0
+        ghostInRadiusReward = -0.05
+        ghostNotInRadiusReward = 0.01
+        ghostChasingReward = -0.02
+        #set livingReward
+        newScore = livingReward
 
-        foodPenalty=0
-        deathPenalty=1500
-        stillPenalty = 100;
-        for i in foodList:
+        #Scoring Starts here
+
+        #foodReward
+        for i in currentFoodList:
             xpos = i[0]
             ypos = i[1]
-            if (newFood[xpos][ypos] == True):
-                foodPenalty = foodPenalty+1
-        newScore = 10000 - foodPenalty
-        if (newPos==successorGameState.getPacmanPosition):
-            newScore = 10000-stillPenalty
-        # Check if ghost can come close to us
-        for i in legalActions:
-            possibleState = successorGameState.generatePacmanSuccessor(i)
+            if (currentFood[xpos][ypos] == True):
+                if(successorPosition == (xpos,ypos)):
+                    newScore = newScore +foodReward
+        #winReward
+        if (successorNumFood==0):
+            newScore = newScore + winReward
 
-            if (possibleState.getGhostPosition(1)==newPos):
-                newScore = -1000
+        #loseReward
+        if (successorPosition == successorGhostPosition):
+            print "here"
+            newScore = loseReward
+            return newScore
+        #stillReward
+        if (successorPosition==currentPosition):
+            newScore = newScore + stillReward
+
+        #ghostChasingReward
+        if (currentPosition == successorGhostPosition):
+            newScore = newScore +ghostChasingReward
+
+        #ghostRadiusReward
+        ghostNearby = False
+        ghostRadius = [(currentPosition[0]+1,currentPosition[1]),(currentPosition[0]-1,currentPosition[1]),(currentPosition[0],currentPosition[1]+1),(currentPosition[0],currentPosition[1]-1),(currentPosition[0]+1,currentPosition[1]+1),(currentPosition[0]+1,currentPosition[1]-1),(currentPosition[0]-1,currentPosition[1]+1),(currentPosition[0]-1,currentPosition[1]-1)]
+        for i in ghostRadius:
+            if (currentGhostPosition == i):
+                ghostNearby = True
+        if (ghostNearby == True):
+            currentGhostDistance = math.sqrt(math.pow((currentPosition[0] - currentGhostPosition[0]),2) + math.pow(currentPosition[1] - currentGhostPosition[1],2))
+            successorGhostDistance = math.sqrt(math.pow((successorPosition[0] - successorGhostPosition[0]),2) + math.pow(successorPosition[1] - successorGhostPosition[1],2))
+            if (successorGhostDistance<= 3):
+                newScore = newScore -0.05
+            if (successorGhostDistance<=currentGhostDistance):
+                newScore = newScore + ghostInRadiusReward
+            if (successorGhostDistance > currentGhostDistance):
+                newScore = newScore + ghostNotInRadiusReward
+
+        if (ghostNearby == False):
+                newScore = newScore + ghostNotInRadiusReward
+        #capsuleReward closerToCapsuleReward
+        if (len(currentCapsule)>0):
+            if (len(successorCapsule)>0):
+                currentCapsulePosition = currentCapsule[0]
+                currentCapsuleDistance = math.sqrt(math.pow((currentPosition[0] - currentCapsulePosition[0]),2) + math.pow(currentPosition[1] - currentCapsulePosition[1],2))
+                successorCapsuleDistance = math.sqrt(math.pow((successorPosition[0] - currentCapsulePosition[0]),2) + math.pow(successorPosition[1] - currentCapsulePosition[1],2))
+                if (successorCapsuleDistance<currentCapsuleDistance):
+                    newScore = newScore + closerToCapsuleReward
+
+            else:
+                # Next state we eat capsule
+                newScore = newScore + capsuleReward
+        #chaseGhostEatGhost
+        else:
+            if (currentScaredTimes[0]>3):
+                currentGhostDistance = math.sqrt(math.pow((currentPosition[0] - currentGhostPosition[0]),2) + math.pow(currentPosition[1] - currentGhostPosition[1],2))
+                successorGhostDistance = math.sqrt(math.pow((successorPosition[0] - successorGhostPosition[0]),2) + math.pow(successorPosition[1] - successorGhostPosition[1],2))
+                if (successorGhostDistance<currentGhostDistance):
+                    newScore = newScore + eatGhostReward - ghostInRadiusReward -ghostNotInRadiusReward
+
+        # closerToFoodReward
+        foodNearby = False
+        neighbouringPositions = [(currentPosition[0]+1,currentPosition[1]),(currentPosition[0]-1,currentPosition[1]),(currentPosition[0],currentPosition[1]+1),(currentPosition[0],currentPosition[1]-1)]
+        for i in neighbouringPositions:
+            if (currentFood[i[0]][i[1]] == True):
+                foodNearby = True
+        if (foodNearby == False):
+            nearestFoodPosition = currentFoodList[0]
+            currentFoodDistance = math.sqrt(math.pow((currentPosition[0] - nearestFoodPosition[0]),2) + math.pow(currentPosition[1] - nearestFoodPosition[1],2))
+            successorFoodDistance = math.sqrt(math.pow((successorPosition[0] - nearestFoodPosition[0]),2) + math.pow(successorPosition[1] - nearestFoodPosition[1],2))
+            if(successorFoodDistance<currentFoodDistance):
+                if(successorPosition!=successorGhostPosition):
+                    if(successorPosition!=currentGhostPosition):
+                        newScore = newScore + closerToFoodReward
 
         return newScore
 
