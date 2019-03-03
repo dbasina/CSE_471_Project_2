@@ -330,9 +330,10 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
     Your minimax agent with alpha-beta pruning (question 3)
     """
+        """
+    Your minimax agent with alpha-beta pruning (question 3)
+    """
     def getAction(self, gameState):
-<<<<<<< HEAD
-=======
         """
           Returns the minimax action using self.depth and self.evaluationFunction
         """
@@ -408,9 +409,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         a = recursiveMax(0, state, agentTracker, agentCycle, float("-inf"), float("inf"))
         return a
 
->>>>>>> 6da38fa8619e518f481b074c8aaa8ea9428ba0b9
         util.raiseNotDefined()
-
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
