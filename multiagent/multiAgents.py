@@ -331,6 +331,84 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     Your minimax agent with alpha-beta pruning (question 3)
     """
     def getAction(self, gameState):
+<<<<<<< HEAD
+=======
+        """
+          Returns the minimax action using self.depth and self.evaluationFunction
+        """
+        "*** YOUR CODE HERE ***"
+        # Variables
+        numberOfAgents = gameState.getNumAgents()
+        agentCycle = []
+        for i in range(self.depth):
+            for j in range(numberOfAgents):
+                agentCycle.append(j)
+        agentCycle.append(0)
+        print "agentCycle: ", agentCycle
+        print "isWin: ", gameState.isWin()
+        print "isLose", gameState.isLose()
+        print "Max Depth = ", self.depth
+        agentTracker = 0
+        depth = 0
+        maxDepth = len(agentCycle) - 1
+        state = gameState
+        actions = gameState.getLegalActions()
+
+        # Variables Used in Recursion
+        # depth
+        # state
+        # agentTracker
+        # agentCycle
+
+        def recursiveMax(depth, state, agentTracker, agentCycle, alpha, beta):
+            legalActions = state.getLegalActions(agentCycle[agentTracker])
+            if len(legalActions) == 0:
+                return scoreEvaluationFunction(state)
+            # Setup Variable to make recursive call
+            nextDepth = depth + 1
+            nextAgentTracker = agentTracker + 1
+            maxValue = float("-inf")
+            for i in legalActions:
+                value = recursiveMin(nextDepth, state.generateSuccessor(agentCycle[agentTracker], i), nextAgentTracker, agentCycle, alpha, beta)
+                if value > maxValue:
+                    maxValue = value
+                    action = i
+
+                if maxValue > beta:
+                    return maxValue
+                alpha = max(alpha, maxValue)
+            if depth == 0:
+                return action
+
+            return maxValue
+
+
+        def recursiveMin(depth, state, agentTracker, agentCycle, alpha, beta):
+            if (depth == maxDepth - 1):
+                return scoreEvaluationFunction(state)
+            legalActions = state.getLegalActions(agentCycle[agentTracker])
+            if len(legalActions) == 0:
+                # print "State has no legal Actions"
+                return scoreEvaluationFunction(state)
+            # Setup Variables to make recursive call
+            nextDepth = depth + 1
+            nextAgentTracker = agentTracker + 1
+            minValue = float("inf")
+            for i in legalActions:
+                if (agentCycle[nextAgentTracker] != 0):
+                    value = recursiveMin(depth, state.generateSuccessor(agentCycle[agentTracker], i), nextAgentTracker, agentCycle, alpha, beta)
+                else:
+                    value = recursiveMax(nextDepth, state.generateSuccessor(agentCycle[agentTracker], i), nextAgentTracker, agentCycle, alpha, beta)
+                minValue = min(minValue, value)
+                if minValue <= alpha:
+                    return minValue
+                beta = min(beta, minValue)
+            return minValue
+
+        a = recursiveMax(0, state, agentTracker, agentCycle, float("-inf"), float("inf"))
+        return a
+
+>>>>>>> 6da38fa8619e518f481b074c8aaa8ea9428ba0b9
         util.raiseNotDefined()
 
 
