@@ -158,10 +158,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
             for j in range(numberOfAgents):
                 agentCycle.append(j);
         agentCycle.append(0);
-        print agentCycle
-        print gameState.isWin();
-        print gameState.isLose();
-        print "Max Depth = ",self.depth
+        #print agentCycle
+        #print gameState.isWin();
+        #print gameState.isLose();
+        #print "Max Depth = ",self.depth
         agentTracker=0
         depth = 0
         maxDepth = len(agentCycle)-1
